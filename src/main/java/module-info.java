@@ -4,7 +4,9 @@ module com.jsulbaran.apps.personalfilemanager {
 
     requires org.controlsfx.controls;
     requires java.desktop;
-    requires java.logging;
+    requires org.apache.commons.io;
+    requires com.google.gson;
+    requires org.slf4j;
 
     opens com.jsulbaran.apps.personalfilemanager to javafx.fxml;
     exports com.jsulbaran.apps.personalfilemanager;

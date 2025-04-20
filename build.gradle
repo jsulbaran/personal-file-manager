@@ -36,7 +36,9 @@ javafx {
 
 dependencies {
     implementation('org.controlsfx:controlsfx:11.2.1')
-
+    implementation("commons-io:commons-io:2.19.0")
+    implementation ("com.google.code.gson:gson:2.13.0")
+    implementation("org.slf4j:slf4j-simple:2.0.17")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
