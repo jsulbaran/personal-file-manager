@@ -3,10 +3,14 @@ package com.jsulbaran.apps.personalfilemanager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jsulbaran.apps.personalfilemanager.dto.FileDTO;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -24,6 +28,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 
 public class HelloController implements Initializable {
 
@@ -33,7 +38,11 @@ public class HelloController implements Initializable {
     @FXML
     private Label welcomeText;
     @FXML
+    private TextField searchInput;
+    @FXML
     private ListView<FileDTO> filesList;
+    private final ObservableList<FileDTO> observableList = FXCollections.observableArrayList();
+    private final FilteredList<FileDTO> filteredList = new FilteredList<>(observableList);
     private Stage stage;
     private final Desktop desktop = Desktop.getDesktop();
 
@@ -41,7 +50,18 @@ public class HelloController implements Initializable {
         this.stage = stage;
     }
 
-
+    @FXML
+    protected void filterItems() {
+        final String textFilter = searchInput.getText();
+        if (textFilter == null || textFilter.trim().isEmpty()) {
+            initializeList();
+            filteredList.setPredicate(null);
+        } else {
+            Predicate<FileDTO> filter = t -> t.name().contains(textFilter);
+            filteredList.setPredicate(filter);
+        }
+    }
+// TODO avoid file duplication
     @FXML
     protected void onOpenFileClick() {
         FileChooser fileChooser = new FileChooser();
@@ -52,7 +72,8 @@ public class HelloController implements Initializable {
             final String name = FilenameUtils.getName(path);
             System.out.println("file : " + path);
             final FileDTO newFile = new FileDTO(path, name);
-            filesList.getItems().add(newFile);
+            observableList.add(newFile);
+//            filesList.getItems().add(newFile);
             writeNewItem(newFile);
 
         }
@@ -110,7 +131,9 @@ public class HelloController implements Initializable {
         try {
             final List<String> strings = Files.readAllLines(previousState.toPath());
             final List<FileDTO> parsedList = strings.stream().map(this::parse).toList();
-            parsedList.forEach(it -> filesList.getItems().add(it));
+            observableList.clear();
+            observableList.addAll(parsedList);
+            filesList.setItems(filteredList);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
