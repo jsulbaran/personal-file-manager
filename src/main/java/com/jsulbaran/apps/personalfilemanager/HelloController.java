@@ -120,6 +120,7 @@ public class HelloController implements Initializable {
         final File previousState = new File(FILENAME);
         if (!previousState.exists()) {
             createNewFile(previousState);
+            filesList.setItems(filteredList);
         } else {
             loadPreviousState(previousState);
         }
